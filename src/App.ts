@@ -1,12 +1,10 @@
 import * as express from 'express'
 import type { Server } from 'http'
+import { printElo } from './mcsr'
 
 export default class App {
   #api: Server | undefined;
 
-  /**
-   * Start the app.
-   */
   public async boot() {
     const api = express();
     const port = 3100;
@@ -15,15 +13,12 @@ export default class App {
       const { data } = await fetch('https://api.mcsrranked.com/users/breadworms')
         .then(r => r.json());
 
-      res.send(data.eloRate);
+      res.send(printElo(data.eloRate));
     });
 
     this.#api = api.listen(port);
   }
 
-  /**
-   * Shut the app down, closing all open connections.
-   */
   public async destroy() {
     this.#api?.close();
   }
