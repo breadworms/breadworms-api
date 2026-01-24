@@ -9,7 +9,7 @@ export default class App {
    */
   public async boot() {
     const api = express();
-    const port = 3000;
+    const port = 3100;
 
     api.get('/mcsr-ranked-elo', async (req, res) => {
       const { data } = await fetch('https://api.mcsrranked.com/users/breadworms')
