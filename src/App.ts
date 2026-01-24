@@ -18,17 +18,13 @@ export default class App {
       res.send(data.eloRate);
     });
 
-    this.#api = api.listen(port, () => {
-      console.log(`API booted and listening on port ${port}!`);
-    });
+    this.#api = api.listen(port);
   }
 
   /**
-   * Shut the server down, closing all open connections.
+   * Shut the app down, closing all open connections.
    */
   public async destroy() {
     this.#api?.close();
-
-    console.log(`API shut down!`);
   }
 }
