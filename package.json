@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "name": "gofish-api",
+  "version": "0.1.0",
+  "scripts": {
+    "watch": "tsc --watch",
+    "build": "tsc",
+    "start": "pm2 start",
+    "stop": "pm2 stop all",
+    "restart": "pm2 reload all",
+    "deploy": "git pull && npm install && npm run build && npm run restart"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.0.10",
+    "typescript": "^5.9.3"
+  }
+}
