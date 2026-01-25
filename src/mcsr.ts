@@ -1,4 +1,4 @@
-const rankedEloBrackets: [number, string][] = [
+const eloBrackets: [number, string][] = [
   [2000, 'netherite'],
   [1500, 'diamond'],
   [1200, 'emerald'],
@@ -7,10 +7,10 @@ const rankedEloBrackets: [number, string][] = [
   [0, 'coal']
 ];
 
-export function printElo(elo: number) {
-  for (const [eloBracket, title] of rankedEloBrackets) {
-    if (elo >= eloBracket) {
-      return `${title} ${elo}`;
+export function printElo(elo: number | null) {
+  for (const [threshold, bracket] of eloBrackets) {
+    if (elo! >= threshold) {
+      return `${bracket} ${elo}`;
     }
   }
 

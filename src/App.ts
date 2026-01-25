@@ -1,6 +1,6 @@
 import * as express from 'express'
 import type { Server } from 'http'
-import { printElo } from './mcsr'
+import * as mcsr from './mcsr'
 
 export default class App {
   #api: Server | undefined;
@@ -10,10 +10,10 @@ export default class App {
     const port = 3100;
 
     api.get('/mcsr-ranked-elo', async (req, res) => {
-      const { data } = await fetch('https://api.mcsrranked.com/users/breadworms')
+      const userData = await fetch('https://api.mcsrranked.com/users/breadworms')
         .then(r => r.json());
 
-      res.send(printElo(data.eloRate));
+      res.send(mcsr.printElo(userData?.data?.eloRate ?? null));
     });
 
     this.#api = api.listen(port);
