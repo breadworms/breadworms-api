@@ -10,10 +10,7 @@ export default class App {
     const port = 3100;
 
     api.get('/mcsr-ranked-elo', async (req, res) => {
-      const userData = await fetch('https://api.mcsrranked.com/users/breadworms')
-        .then(r => r.json());
-
-      res.send(mcsr.printElo(userData?.data?.eloRate ?? null));
+      res.send(await mcsr.getUserElo('breadworms'));
     });
 
     this.#api = api.listen(port);
