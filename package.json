@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "gofish-api",
+  "name": "breadworms-api",
   "version": "0.1.0",
   "scripts": {
     "watch": "tsc --watch",
