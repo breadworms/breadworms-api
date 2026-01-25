@@ -6,8 +6,8 @@
     "watch": "tsc --watch",
     "build": "tsc",
     "start": "pm2 start",
-    "stop": "pm2 stop all",
-    "restart": "pm2 reload all",
+    "stop": "pm2 stop ecosystem.config.js",
+    "restart": "pm2 reload ecosystem.config.js",
     "deploy": "git pull && npm install && npm run build && npm run restart"
   },
   "dependencies": {
