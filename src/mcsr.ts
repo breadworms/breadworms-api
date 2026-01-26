@@ -9,7 +9,7 @@ const eloBrackets: [number, string][] = [
 
 export async function getUserElo(user: string) {
   const userData = await fetch(`https://api.mcsrranked.com/users/${user}`)
-    .then(r => r.json());
+    .then(res => res.json());
   const elo: number = userData?.data?.eloRate ?? null;
 
   for (const [threshold, bracket] of eloBrackets) {
