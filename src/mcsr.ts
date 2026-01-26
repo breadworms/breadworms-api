@@ -18,5 +18,5 @@ export async function getUserElo(user: string) {
     }
   }
 
-  return `unrated`;
+  return `not rated`;
 }
