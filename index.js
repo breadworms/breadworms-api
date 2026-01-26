@@ -5,7 +5,7 @@ function destructor() {
 }
 
 function errorDestructor(error) {
-  log.error(error.stack ?? error);
+  console.error(error.stack ?? error);
   app.destroy().finally(() => process.exit(1));
 }
 
