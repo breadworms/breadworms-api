@@ -7,14 +7,18 @@ const eloBrackets: [number, string][] = [
   [0, 'coal']
 ];
 
-export async function getUserElo(user: string) {
-  const userData = await fetch(`https://api.mcsrranked.com/users/${user}`)
+const userEmotes: Record<string, string> = {
+  'breadworms': 'bert'
+};
+
+export async function getUserElo(identifier: string) {
+  const userData = await fetch(`https://api.mcsrranked.com/users/${identifier}`)
     .then(res => res.json());
-  const elo: number = userData?.data?.eloRate ?? null;
+  const elo: number = userData?.data?.eloRate ?? -1;
 
   for (const [threshold, bracket] of eloBrackets) {
     if (elo >= threshold) {
-      return `${bracket} ${elo}`;
+      return `${bracket} ${elo} ${userEmotes[identifier] ?? 'ep'}`;
     }
   }
 

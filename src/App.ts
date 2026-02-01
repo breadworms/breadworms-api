@@ -9,8 +9,8 @@ export default class App {
     const api = express();
     const port = 3100;
 
-    api.get('/mcsr-ranked-elo', async (req, res) => {
-      res.send(await mcsr.getUserElo('breadworms'));
+    api.get('/mcsr-ranked-elo/:identifier', async (req, res) => {
+      res.send(await mcsr.getUserElo(req.params.identifier));
     });
 
     this.#api = api.listen(port);
