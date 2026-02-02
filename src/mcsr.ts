@@ -12,7 +12,7 @@ const userEmotes: Record<string, string> = {
 };
 
 export async function getUserElo(identifier: string) {
-  const userData = await fetch(`https://api.mcsrranked.com/users/${identifier}`)
+  const userData = await fetch(`https://api.mcsrranked.com/users/${encodeURIComponent(identifier)}`)
     .then(res => res.json());
   const elo: number = userData?.data?.eloRate ?? -1;
 
