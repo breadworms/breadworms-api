@@ -10,7 +10,9 @@ export default class App {
     const port = 3100;
 
     api.get('/mcsr-ranked-elo/:identifier', async (req, res) => {
-      res.send(await mcsr.getUserElo(req.params.identifier));
+      const text = await mcsr.getUserElo(req.params.identifier.toLowerCase());
+
+      res.send(text);
     });
 
     this.#api = api.listen(port);
