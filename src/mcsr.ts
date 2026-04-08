@@ -62,6 +62,6 @@ function printSessionForUser(uuid: string, matches: any[]) {
   }
 
   return wins + losses + draws > 0
-    ? ` (today: ${wins}-${losses}-${draws})`
+    ? ` (today: ${wins}-${losses}${draws > 0 ? '-' + draws : ''})`
     : '';
 }
