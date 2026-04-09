@@ -42,26 +42,35 @@ export async function getUserElo(identifier: string) {
 }
 
 function printSessionForUser(uuid: string, matches: any[]) {
-  const terminal = Math.round(Date.now() * 0.001) - 60 * 60 * 12;
+  let terminal = Math.round(Date.now() * 0.001) - 60 * 60 * 12;
   let wins = 0;
   let losses = 0;
-  let draws = 0;
+  let total = 0;
 
   for (const match of matches) {
     if (match.date <= terminal) {
       break;
     }
 
+    if (total === 0) {
+      for (const vod of match.vod) {
+        if (vod.uuid === uuid) {
+          terminal = vod.startsAt;
+          break;
+        }
+      }
+    }
+
     if (match.result.uuid === uuid) {
       wins += 1;
     } else if (match.result.uuid !== null) {
       losses += 1;
-    } else {
-      draws += 1;
     }
+
+    total += 1;
   }
 
-  return wins + losses + draws > 0
-    ? ` (today: ${wins}-${losses}${draws > 0 ? '-' + draws : ''})`
+  return total > 0
+    ? ` (today: ${wins}-${losses}${total > (wins + losses) ? '-' + (total - wins - losses) : ''})`
     : '';
 }
