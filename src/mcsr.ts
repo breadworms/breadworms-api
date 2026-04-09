@@ -42,7 +42,9 @@ export async function getUserElo(identifier: string) {
 }
 
 function printSessionForUser(uuid: string, matches: any[]) {
-  let terminal = Math.round(Date.now() * 0.001) - 60 * 60 * 12;
+  const timeInSeconds = Math.round(Date.now() * 0.001);
+  const terminal24 = timeInSeconds - 86400; // 24h
+  let terminal = timeInSeconds - 43200; // 12h
   let wins = 0;
   let losses = 0;
   let total = 0;
@@ -52,12 +54,13 @@ function printSessionForUser(uuid: string, matches: any[]) {
       break;
     }
 
-    if (total === 0) {
-      for (const vod of match.vod) {
-        if (vod.uuid === uuid) {
-          terminal = vod.startsAt;
-          break;
-        }
+    for (const vod of match.vod) {
+      if (vod.uuid !== uuid) {
+        continue;
+      }
+
+      if (vod.startsAt < terminal) {
+        terminal = Math.max(vod.startsAt, terminal24);
       }
     }
 
