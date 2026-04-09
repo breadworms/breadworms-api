@@ -7,8 +7,8 @@ const eloBrackets: [number, string][] = [
   [0, 'coal']
 ];
 
-const userEmotes: Record<string, string> = {
-  'breadworms': 'bert'
+const userAffixes: Record<string, string> = {
+  'breadworms': ' bert'
 };
 
 async function get(path: string): Promise<{ status: 'error' | 'success', data: any } | null> {
@@ -29,19 +29,20 @@ export async function getUserElo(identifier: string) {
   }
 
   const { uuid, eloRate } = res.data;
-  const matchesRes = await get(`users/${uuid}/matches?count=100&type=2`);
-  const sessionText = printSessionForUser(uuid, matchesRes?.data ?? []);
 
   for (const [threshold, bracket] of eloBrackets) {
     if (eloRate >= threshold) {
-      return `${bracket} ${eloRate} ${userEmotes[identifier] ?? ''}${sessionText}`;
+      const matchesRes = await get(`users/${uuid}/matches?count=100&type=2`);
+      const sessionAffix = matchesToSession(uuid, matchesRes?.data ?? []);
+
+      return `${bracket} ${eloRate}${userAffixes[identifier] ?? ''}${sessionAffix}`;
     }
   }
 
   throw new Error(`Could not print elo: ${identifier}'s elo was ${eloRate} (a negative number).`);
 }
 
-function printSessionForUser(uuid: string, matches: any[]) {
+function matchesToSession(uuid: string, matches: any[]) {
   const timeInSeconds = Math.round(Date.now() * 0.001);
   const terminal24 = timeInSeconds - 86400; // 24h
   let terminal = timeInSeconds - 43200; // 12h
@@ -55,11 +56,7 @@ function printSessionForUser(uuid: string, matches: any[]) {
     }
 
     for (const vod of match.vod) {
-      if (vod.uuid !== uuid) {
-        continue;
-      }
-
-      if (vod.startsAt < terminal) {
+      if (vod.uuid === uuid && vod.startsAt < terminal) {
         terminal = Math.max(vod.startsAt, terminal24);
       }
     }
