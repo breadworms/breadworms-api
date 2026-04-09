@@ -1,3 +1,5 @@
+import config from './config'
+
 const eloBrackets: [number, string][] = [
   [2000, 'netherite'],
   [1500, 'diamond'],
@@ -7,13 +9,11 @@ const eloBrackets: [number, string][] = [
   [0, 'coal']
 ];
 
-const userAffixes: Record<string, string> = {
-  'breadworms': ' bert'
-};
-
 async function get(path: string): Promise<{ status: 'error' | 'success', data: any } | null> {
   try {
-    return await fetch(`https://api.mcsrranked.com/${path}`).then(res => res.json());
+    const res = await fetch(`https://api.mcsrranked.com/${path}`);
+
+    return res.json();
   } catch {
     return null;
   }
@@ -23,7 +23,7 @@ export async function getUserElo(identifier: string) {
   const res = await get(`users/${encodeURIComponent(identifier)}`);
 
   if (!res || (res.status === 'error' && res.data?.error !== 'User is not exists.')) {
-    return `error fetching data`;
+    return `error fetching results`;
   } else if (!res.data?.eloRate) {
     return `not rated`;
   }
@@ -34,8 +34,9 @@ export async function getUserElo(identifier: string) {
     if (eloRate >= threshold) {
       const matchesRes = await get(`users/${uuid}/matches?count=100&type=2`);
       const sessionAffix = matchesToSession(uuid, matchesRes?.data ?? []);
+      const emoteAffix = uuid === config.broadcaster.uuid ? ` bert` : '';
 
-      return `${bracket} ${eloRate}${userAffixes[identifier] ?? ''}${sessionAffix}`;
+      return `${bracket} ${eloRate}${emoteAffix}${sessionAffix}`;
     }
   }
 
