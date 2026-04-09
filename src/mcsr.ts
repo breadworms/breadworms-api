@@ -32,7 +32,7 @@ export async function getUserElo(identifier: string) {
 
   for (const [threshold, bracket] of eloBrackets) {
     if (eloRate >= threshold) {
-      const matchesRes = await get(`users/${uuid}/matches?count=100&type=2`);
+      const matchesRes = await get(`users/${uuid}/matches?count=100&type=2&excludedecay=true`);
       const sessionAffix = matchesToSession(uuid, matchesRes?.data ?? []);
       const emoteAffix = uuid === config.broadcaster.uuid ? ` bert` : '';
 

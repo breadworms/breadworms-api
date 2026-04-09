@@ -21,15 +21,15 @@ async function get(path: string) {
 }
 
 export async function getPlayerMmr(battleTag: string) {
-  const playerUrl = encodeURIComponent(battleTag);
-  const player = await get(`players/${playerUrl}`);
+  const playerUrl = `players/${encodeURIComponent(battleTag)}`;
+  const player = await get(playerUrl);
 
   if (!player) {
     return `error fetching results`;
   }
 
   for (const { id } of player.participatedInSeasons ?? []) {
-    const gameModes = await get(`players/${playerUrl}/game-mode-stats?gateWay=20&season=${id}`);
+    const gameModes = await get(`${playerUrl}/game-mode-stats?gateWay=20&season=${id}`);
 
     if (!gameModes || !gameModes.length) {
       break;
