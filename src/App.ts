@@ -34,7 +34,7 @@ export default class App {
     );
 
     api.get(
-      '/lol-rank/:summonerName/:region',
+      '/lol-rank/:region/:summonerName',
       sanitize,
       lowercase,
       async (req, res) => {
@@ -58,7 +58,7 @@ export default class App {
 const sanitize: RequestHandler = ({ params }, res, next) => {
   Object.keys(params).forEach(k => {
     if (typeof params[k] === 'string') {
-      params[k] = params[k].replace(/\s/g, '');
+      params[k] = params[k].trim();
 
       if (params[k] === '') {
         res.status(400).send('invalid parameter');

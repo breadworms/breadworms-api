@@ -3,12 +3,12 @@ import config from './config'
 const API_KEY = config.auth.riot?.apiKey;
 const LOL_REGIONS = new Map(Object.entries({
   'br': 'br1',
-  'eun': 'eun1',
+  'eune': 'eun1',
   'euw': 'euw1',
   'jp': 'jp1',
   'kr': 'kr',
-  'la': 'la1',
-  'la2': 'la2',
+  'las': 'la1',
+  'lan': 'la2',
   'me': 'me1',
   'na': 'na1',
   'oc': 'oc1',
@@ -51,7 +51,10 @@ export async function getSummonerRank(name: string, region: string) {
 
   if (puuid === undefined) {
     const [gameName, tagLine='_'] = name.split(/#(.*)/);
-    const account = await get('europe', `riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`);
+    const account = await get(
+      'europe',
+      `riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`
+    );
 
     if (!account) {
       return `error fetching results`;
