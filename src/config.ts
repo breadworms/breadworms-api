@@ -3,11 +3,18 @@ interface Config {
     uuid?: string;
     battleTag?: string;
   }
+
+  auth: {
+    riot?: {
+      apiKey: string;
+    }
+  }
 }
 
 export default Object.assign(
   {
-    broadcaster: {}
+    broadcaster: {},
+    auth: {}
   } as Config,
   require(`${process.cwd()}/config.json`) as Config
 );

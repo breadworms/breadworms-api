@@ -1,6 +1,6 @@
 import config from './config'
 
-let broadcasterMmr = 0;
+let _broadcasterMmr = 0;
 
 async function get(path: string) {
   try {
@@ -43,11 +43,11 @@ export async function getPlayerMmr(battleTag: string) {
       let emoteAffix = '';
 
       if (battleTag === config.broadcaster.battleTag) {
-        emoteAffix = gameMode.mmr >= broadcasterMmr
+        emoteAffix = gameMode.mmr >= _broadcasterMmr
           ? ` Climb`
           : ` Fall`;
 
-        broadcasterMmr = gameMode.mmr;
+        _broadcasterMmr = gameMode.mmr;
       }
 
       return `${gameMode.mmr}${emoteAffix}`;
