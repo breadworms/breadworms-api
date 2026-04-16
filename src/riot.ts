@@ -1,7 +1,6 @@
 import config from './config'
 
-const API_KEY = config.auth.riot?.apiKey;
-const LOL_REGIONS = new Map(Object.entries({
+const regions = new Map(Object.entries({
   'br': 'br1',
   'eune': 'eun1',
   'euw': 'euw1',
@@ -21,14 +20,14 @@ const LOL_REGIONS = new Map(Object.entries({
 const _puuidCache: Map<string, string> = new Map();
 
 async function api(region: string, path: string) {
-  if (API_KEY === undefined) {
+  if (config.auth.riot === undefined) {
     return null;
   }
 
   try {
     const res = await fetch(`https://${region}.api.riotgames.com/${path}`, {
       headers: {
-        'X-Riot-Token': API_KEY
+        'X-Riot-Token': config.auth.riot.apiKey
       }
     });
 
@@ -56,7 +55,7 @@ function parseSearchString(searchString: string) {
   return {
     gameName: match[1],
     tagLine: match[2],
-    region: LOL_REGIONS.get(match[3]) ?? LOL_REGIONS.get('euw')!
+    region: regions.get(match[3]) ?? regions.get('euw')!
   };
 }
 

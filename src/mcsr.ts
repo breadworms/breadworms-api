@@ -1,6 +1,6 @@
 import config from './config'
 
-const ELO_BRACKETS: [number, string][] = [
+const eloBrackets: [number, string][] = [
   [2000, 'netherite'],
   [1500, 'diamond'],
   [1200, 'emerald'],
@@ -31,7 +31,7 @@ export async function getUserElo(searchString: string) {
 
   const { uuid, eloRate } = res.data;
 
-  for (const [threshold, bracket] of ELO_BRACKETS) {
+  for (const [threshold, bracket] of eloBrackets) {
     if (eloRate >= threshold) {
       const matchesRes = await api(`users/${uuid}/matches?count=100&type=2&excludedecay=true`);
       const sessionAffix = matchesToSession(uuid, matchesRes?.data ?? []);
