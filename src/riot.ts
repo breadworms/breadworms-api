@@ -20,7 +20,7 @@ const LOL_REGIONS = new Map(Object.entries({
 }));
 const _puuidCache: Map<string, string> = new Map();
 
-async function get(region: string, path: string) {
+async function api(region: string, path: string) {
   if (API_KEY === undefined) {
     return null;
   }
@@ -72,7 +72,7 @@ export async function getSummonerRank(searchString: string) {
   let puuid = _puuidCache.get(puuidKey);
 
   if (puuid === undefined) {
-    const account = await get(
+    const account = await api(
       'europe',
       `riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`
     );
@@ -86,7 +86,7 @@ export async function getSummonerRank(searchString: string) {
     _puuidCache.set(puuidKey, puuid = account.puuid);
   }
 
-  const entries = await get(region, `lol/league/v4/entries/by-puuid/${puuid}`);
+  const entries = await api(region, `lol/league/v4/entries/by-puuid/${puuid}`);
 
   if (!entries) {
     return `error fetching results`;
