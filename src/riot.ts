@@ -46,11 +46,32 @@ async function get(region: string, path: string) {
   }
 }
 
-export async function getSummonerRank(name: string, region: string) {
-  let puuid = _puuidCache.get(name);
+function parseSearchString(searchString: string) {
+  const match = searchString.toLowerCase().match(/([^\#]+)#(\S+)(?:\s+(\S+))?/);
+
+  if (match === null) {
+    return null;
+  }
+
+  return {
+    gameName: match[1],
+    tagLine: match[2],
+    region: LOL_REGIONS.get(match[3]) ?? LOL_REGIONS.get('euw')!
+  };
+}
+
+export async function getSummonerRank(searchString: string) {
+  const summoner = parseSearchString(searchString);
+
+  if (summoner === null) {
+    return `not rated`;
+  }
+
+  const { gameName, tagLine, region } = summoner;
+  const puuidKey = `${gameName}#${tagLine}`;
+  let puuid = _puuidCache.get(puuidKey);
 
   if (puuid === undefined) {
-    const [gameName, tagLine='_'] = name.split(/#(.*)/);
     const account = await get(
       'europe',
       `riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`
@@ -62,14 +83,10 @@ export async function getSummonerRank(name: string, region: string) {
       return `not rated`;
     }
 
-    _puuidCache.set(name, puuid = account.puuid);
+    _puuidCache.set(puuidKey, puuid = account.puuid);
   }
 
-  if (!LOL_REGIONS.has(region)) {
-    return `unknown region`;
-  }
-
-  const entries = await get(LOL_REGIONS.get(region)!, `lol/league/v4/entries/by-puuid/${puuid}`);
+  const entries = await get(region, `lol/league/v4/entries/by-puuid/${puuid}`);
 
   if (!entries) {
     return `error fetching results`;

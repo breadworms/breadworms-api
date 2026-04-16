@@ -9,7 +9,7 @@ const ELO_BRACKETS: [number, string][] = [
   [0, 'coal']
 ];
 
-async function get(path: string): Promise<{ status: 'error' | 'success', data: any } | null> {
+async function api(path: string): Promise<{ status: 'error' | 'success', data: any } | null> {
   try {
     const res = await fetch(`https://api.mcsrranked.com/${path}`);
 
@@ -19,8 +19,9 @@ async function get(path: string): Promise<{ status: 'error' | 'success', data: a
   }
 }
 
-export async function getUserElo(identifier: string) {
-  const res = await get(`users/${encodeURIComponent(identifier)}`);
+export async function getUserElo(searchString: string) {
+  const identifier = searchString.toLowerCase();
+  const res = await api(`users/${encodeURIComponent(identifier)}`);
 
   if (!res || (res.status === 'error' && res.data?.error !== 'User is not exists.')) {
     return `error fetching results`;
@@ -32,7 +33,7 @@ export async function getUserElo(identifier: string) {
 
   for (const [threshold, bracket] of ELO_BRACKETS) {
     if (eloRate >= threshold) {
-      const matchesRes = await get(`users/${uuid}/matches?count=100&type=2&excludedecay=true`);
+      const matchesRes = await api(`users/${uuid}/matches?count=100&type=2&excludedecay=true`);
       const sessionAffix = matchesToSession(uuid, matchesRes?.data ?? []);
       const emoteAffix = uuid === config.broadcaster.uuid ? ` bert` : '';
 
@@ -40,7 +41,7 @@ export async function getUserElo(identifier: string) {
     }
   }
 
-  throw new Error(`Could not print elo: ${identifier}'s elo was ${eloRate} (a negative number).`);
+  throw new Error(`Could not print elo: ${identifier}'s elo was ${eloRate} (a negative or invalid number).`);
 }
 
 function matchesToSession(uuid: string, matches: any[]) {

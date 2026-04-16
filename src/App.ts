@@ -6,81 +6,44 @@ import * as wc3 from './wc3'
 import * as riot from './riot'
 
 export default class App {
-  #api: Server | undefined;
+  #server: Server | undefined;
 
   public async boot() {
-    const api = express();
+    const app = express();
     const port = 3100;
 
-    api.get(
-      '/mcsr-ranked-elo/:identifier',
-      sanitize,
-      lowercase,
-      async (req, res) => {
-        const text = await mcsr.getUserElo(req.params.identifier as string);
+    const trim: RequestHandler<{ message: string }> = (req, res, next) => {
+      req.params.message = req.params.message.trim();
 
-        res.send(text);
+      if (req.params.message === '') {
+        throw new Error(`Request ${req.url} had empty message.`);
       }
-    );
 
-    api.get(
-      '/w3c-mmr/:battleTag',
-      sanitize,
-      async (req, res) => {
-        const text = await wc3.getPlayerMmr(req.params.battleTag as string);
+      next();
+    };
 
-        res.send(text);
-      }
-    );
+    app.get('/mcsr-ranked-elo/:message', trim, async (req, res) => {
+      const text = await mcsr.getUserElo(req.params.message);
 
-    api.get(
-      '/lol-rank/:region/:summonerName',
-      sanitize,
-      lowercase,
-      async (req, res) => {
-        const text = await riot.getSummonerRank(
-          req.params.summonerName as string,
-          req.params.region as string
-        );
+      res.send(text);
+    });
 
-        res.send(text);
-      }
-    );
+    app.get('/w3c-mmr/:message', trim, async (req, res) => {
+      const text = await wc3.getPlayerMmr(req.params.message);
 
-    this.#api = api.listen(port);
+      res.send(text);
+    });
+
+    app.get('/lol-rank/:message', trim, async (req, res) => {
+      const text = await riot.getSummonerRank(req.params.message);
+
+      res.send(text);
+    });
+
+    this.#server = app.listen(port);
   }
 
   public async destroy() {
-    this.#api?.close();
+    this.#server?.close();
   }
-}
-
-const sanitize: RequestHandler = ({ params }, res, next) => {
-  Object.keys(params).forEach(k => {
-    if (typeof params[k] === 'string') {
-      params[k] = params[k].trim();
-
-      if (params[k] === '') {
-        res.status(400).send('invalid parameter');
-      }
-    } else {
-      res.status(400).send('invalid parameter');
-    }
-  });
-
-  if (res.headersSent) {
-    return;
-  }
-
-  next();
-}
-
-const lowercase: RequestHandler = ({ params }, res, next) => {
-  Object.keys(params).forEach(k => {
-    if (typeof params[k] === 'string') {
-      params[k] = params[k].toLowerCase();
-    }
-  });
-
-  next();
 }

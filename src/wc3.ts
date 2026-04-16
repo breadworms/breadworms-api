@@ -2,7 +2,7 @@ import config from './config'
 
 let _broadcasterMmr = 0;
 
-async function get(path: string) {
+async function api(path: string) {
   try {
     const res = await fetch(`https://website-backend.w3champions.com/api/${path}`);
 
@@ -20,16 +20,17 @@ async function get(path: string) {
   }
 }
 
-export async function getPlayerMmr(battleTag: string) {
+export async function getPlayerMmr(searchString: string) {
+  const battleTag = searchString;
   const playerUrl = `players/${encodeURIComponent(battleTag)}`;
-  const player = await get(playerUrl);
+  const player = await api(playerUrl);
 
   if (!player) {
     return `error fetching results`;
   }
 
   for (const { id } of player.participatedInSeasons ?? []) {
-    const gameModes = await get(`${playerUrl}/game-mode-stats?gateWay=20&season=${id}`);
+    const gameModes = await api(`${playerUrl}/game-mode-stats?gateWay=20&season=${id}`);
 
     if (!gameModes || !gameModes.length) {
       break;
