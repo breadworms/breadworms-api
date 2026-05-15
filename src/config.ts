@@ -2,6 +2,7 @@ interface Config {
   broadcaster: {
     uuid?: string;
     battleTag?: string;
+    summonerName?: string;
   }
 
   auth: {

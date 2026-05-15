@@ -53,6 +53,7 @@ function parseSearchString(searchString: string) {
   }
 
   return {
+    name: `${match[1]}#${match[2]}`,
     gameName: match[1],
     tagLine: match[2],
     region: regions.get(match[3]) ?? regions.get('euw')!
@@ -66,9 +67,8 @@ export async function getSummonerRank(searchString: string) {
     return `not rated`;
   }
 
-  const { gameName, tagLine, region } = summoner;
-  const puuidKey = `${gameName}#${tagLine}`;
-  let puuid = _puuidCache.get(puuidKey);
+  const { name, gameName, tagLine, region } = summoner;
+  let puuid = _puuidCache.get(name);
 
   if (puuid === undefined) {
     const account = await api(
@@ -82,7 +82,7 @@ export async function getSummonerRank(searchString: string) {
       return `not rated`;
     }
 
-    _puuidCache.set(puuidKey, puuid = account.puuid);
+    _puuidCache.set(name, puuid = account.puuid);
   }
 
   const entries = await api(region, `lol/league/v4/entries/by-puuid/${puuid}`);
@@ -100,7 +100,10 @@ export async function getSummonerRank(searchString: string) {
 
     const division = ['MASTER', 'GRANDMASTER', 'CHALLENGER'].includes(entry.tier)
       ? `${entry.leaguePoints} lp`
-      : { I: 1, II: 2, III: 3, IV: 4 }[entry.rank as string];
+      : (
+        { I: 1, II: 2, III: 3, IV: 4 }[entry.rank as string]
+        + (name === config.broadcaster.summonerName ? ` ${entry.leaguePoints} lp` : '')
+      );
 
     return `${entry.tier.toLowerCase()} ${division}`;
   }
