@@ -46,17 +46,20 @@ async function api(region: string, path: string) {
 }
 
 function parseSearchString(searchString: string) {
-  const match = searchString.toLowerCase().match(/([^\#]+)#(\S+)(?:\s+(\S+))?/);
+  const match = searchString.toLowerCase().match(/\s*([^\#]+?)\s*#(\S+)(?:\s+(\S+))?/);
 
   if (match === null) {
     return null;
   }
 
+  const regionKey = regions.has(match[3]) ? match[3] : 'euw';
+
   return {
     name: `${match[1]}#${match[2]}`,
     gameName: match[1],
     tagLine: match[2],
-    region: regions.get(match[3]) ?? regions.get('euw')!
+    region: regions.get(regionKey)!,
+    opgg: `https://op.gg/lol/summoners/${regionKey}/${encodeURIComponent(match[1] + '-' + match[2])}`
   };
 }
 
@@ -67,7 +70,7 @@ export async function getSummonerRank(searchString: string) {
     return `not rated`;
   }
 
-  const { name, gameName, tagLine, region } = summoner;
+  const { name, gameName, tagLine, region, opgg } = summoner;
   let puuid = _puuidCache.get(name);
 
   if (puuid === undefined) {
@@ -105,7 +108,7 @@ export async function getSummonerRank(searchString: string) {
         + (name === config.broadcaster.summonerName ? ` ${entry.leaguePoints} lp` : '')
       );
 
-    return `${entry.tier.toLowerCase()} ${division}`;
+    return `${entry.tier.toLowerCase()} ${division} ${opgg}`;
   }
 
   return `not rated`;
