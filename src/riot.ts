@@ -101,14 +101,11 @@ export async function getSummonerRank(searchString: string) {
       continue;
     }
 
-    const division = ['MASTER', 'GRANDMASTER', 'CHALLENGER'].includes(entry.tier)
-      ? `${entry.leaguePoints} lp`
-      : (
-        { I: 1, II: 2, III: 3, IV: 4 }[entry.rank as string]
-        + (name === config.broadcaster.summonerName ? ` ${entry.leaguePoints} lp` : '')
-      );
+    const division = !['MASTER', 'GRANDMASTER', 'CHALLENGER'].includes(entry.tier)
+      ? ` ${{ I: 1, II: 2, III: 3, IV: 4 }[entry.rank as string]}`
+      : ``;
 
-    return `${entry.tier.toLowerCase()} ${division} ${opgg}`;
+    return `${entry.tier.toLowerCase()}${division} ${entry.leaguePoints} lp ${opgg}`;
   }
 
   return `not rated`;
