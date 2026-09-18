@@ -1,6 +1,7 @@
 import config from './config'
 
-const regions = new Map(Object.entries({
+const _puuidCache: Map<string, string> = new Map();
+const opggRegions = new Map(Object.entries({
   'br': 'br1',
   'eune': 'eun1',
   'euw': 'euw1',
@@ -17,7 +18,6 @@ const regions = new Map(Object.entries({
   'tw': 'tw2',
   'vn': 'vn2'
 }));
-const _puuidCache: Map<string, string> = new Map();
 
 async function api(region: string, path: string) {
   if (config.auth.riot === undefined) {
@@ -52,14 +52,16 @@ function parseSearchString(searchString: string) {
     return null;
   }
 
-  const regionKey = regions.has(match[3]) ? match[3] : 'euw';
+  const gameName = encodeURIComponent(match[1]);
+  const tagLine = encodeURIComponent(match[2]);
+  const regionKey = opggRegions.has(match[3]) ? match[3] : 'euw';
 
   return {
     name: `${match[1]}#${match[2]}`,
-    gameName: match[1],
-    tagLine: match[2],
-    region: regions.get(regionKey)!,
-    opgg: `https://op.gg/lol/summoners/${regionKey}/${encodeURIComponent(match[1] + '-' + match[2])}`
+    gameName,
+    tagLine,
+    region: opggRegions.get(regionKey)!,
+    opgg: `https://op.gg/lol/summoners/${regionKey}/${gameName}-${tagLine}`
   };
 }
 
@@ -76,7 +78,7 @@ export async function getSummonerRank(searchString: string) {
   if (puuid === undefined) {
     const account = await api(
       'europe',
-      `riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`
+      `riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`
     );
 
     if (!account) {
@@ -102,8 +104,8 @@ export async function getSummonerRank(searchString: string) {
     }
 
     const division = !['MASTER', 'GRANDMASTER', 'CHALLENGER'].includes(entry.tier)
-      ? ` ${{ I: 1, II: 2, III: 3, IV: 4 }[entry.rank as string]}`
-      : ``;
+      ? ' ' + { I: 1, II: 2, III: 3, IV: 4 }[entry.rank as string]
+      : '';
 
     return `${entry.tier.toLowerCase()}${division} ${entry.leaguePoints} lp ${opgg}`;
   }
